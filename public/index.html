@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="/css/index.css" rel="stylesheet">
+    <link href="/css/snackbar.css" rel="stylesheet">
+    <link rel="stylesheet" href="/fontawesome/css/free.min.css" />
+    <link rel="stylesheet" href="/fontawesome/css/v4-shims.min.css" />
+    <link rel="stylesheet" href="/fontawesome/css/font-face.min.css" />
+    </link>
+</head>
+
+<body>
+    <!-- 本地视频 -->
+    <div class="moveable" id="local_video_moveable">
+        <video id="local_video" autoplay></video>
+        <span class="local_video_text">可拖动</span>
+    </div>
+    <!-- 对等端视频 -->
+    <video id="remote_video" autoplay></video>
+    <!-- 控制区 -->
+    <div id="controls_area" class="controls_area">
+        <div class="controls_item" onclick="toggleAudio()">
+            <i id="audio_icon" class="fas fa-microphone fa-xs"></i>
+            <div id="audio-text">麦克风</div>
+        </div>
+        <div class="controls_item" onclick="toggleVideo()">
+            <i id="video_icon" class="fas fa-video fa-xs"></i>
+            <div id="video-text">摄像头</div>
+        </div>
+        <div class="controls_item" onclick="toggleScreen()">
+            <i id="swap-icon" class="fas fa-desktop fa-xs"></i>
+            <div id="swap-text">屏幕共享</div>
+        </div>
+        <div class="controls_item" onclick="toggleChat()">
+            <i id="chat-icon" class="fas fa-comment fa-xs"></i>
+            <div id="chat-text">聊天</div>
+        </div>
+        <div class="controls_item" onclick="togglePictureInPicture()">
+            <i class="fas fa-external-link-alt fa-xs"></i>
+            <div id="pip-text">画中画</div>
+        </div>
+        <div class="controls_item" onclick="toggleWhiteboard()">
+            <i class="fas fa-chalkboard fa-xs"></i>
+            <div id="whiteboard-text">白板</div>
+        </div>
+        <div class="controls_item" onclick="endCall()">
+            <i id="call_icon" class="fas fa-phone-slash fa-xs"></i>
+            <div id="call_text">结束通话</div>
+        </div>
+    </div>
+    <!-- 聊天区 -->
+    <div id="chat" style="display: none;">
+        <div id="chat-zone">
+        </div>
+        <form class="compose">
+            <input id="chat-input" type="text" placeholder="输入消息" />
+        </form>
+    </div>
+    <!-- 白板区 -->
+    <canvas id="whiteboard" style="display: none;" class="whiteboard" width="600" height="600">
+        抱歉，您的浏览器不支持canvas元素
+    </canvas>
+
+    <script src="/js/snackbar.js"></script>
+    <script src="/js/autolink.js"></script>
+    <script src="/js/common.js"></script>
+    <script src="/js/adapter.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/WRTC.js"></script>
+    <script src="/js/rtc.js"></script>
+</body>
+
+</html>
