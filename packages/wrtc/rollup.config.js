@@ -7,15 +7,23 @@ export default [
       format: 'umd',
       name: 'WRTC',
     },
-    // plugins: [terser()],
+    plugins: [terser()],
   },
   {
     input: 'src/index.js',
     output: {
       file: 'es/WRTC.js',
       format: 'es',
-      name: 'WRTC',
     },
-    // plugins: [terser()],
+    plugins: [terser()],
+  },
+  {
+    input: 'src/index.js',
+    output: {
+      file: 'cjs/WRTC.js',
+      format: 'cjs',
+      exports: 'default',
+    },
+    plugins: [terser()],
   },
 ];

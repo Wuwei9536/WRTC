@@ -1,7 +1,7 @@
 /* 
 webrtc 以外的部分需自行实现
 */
-
+const webSocket = io();
 // 聊天区
 const entireChat = document.getElementById("chat");
 // 聊天消息输入框
@@ -12,39 +12,44 @@ const chatZone = document.getElementById("chat-zone");
 const moveableEles = document.getElementsByClassName("moveable");
 // 远端视频
 const remoteVideo = document.getElementById("remote_video");
+const remoteVideoText = document.getElementById("remote_video_text");
+
 // 本地视频容器
 const localVideoMoveable = document.getElementById("local_video_moveable");
+const localVideoText = document.getElementById("local_video_text");
 // 控制区
 const controlsArea = document.getElementById("controls_area");
+// const controlsIconTexts = document.getElementsByClassName("icon_text");
+const url = window.location.href;
+const urlPath = window.location.pathname;
+const urlType = urlPath
+  .substring(urlPath.indexOf("/") + 1, urlPath.indexOf("/") + 5)
+  .toLowerCase();
+const urlSuffix = url.substring(url.lastIndexOf("/") + 1).toLowerCase();
+let roomHash = urlSuffix;
 
-// 新建WRTC实例  封装了WebRTC联通过程
-window.WRTCEntity = new WRTC({
-  socket: io(),
-  localVideoId: "local_video",
-  remoteVideoId: "remote_video",
-  iceServers: [
-    { url: "stun:180.76.178.16:3478" },
-    {
-      url: "turn:180.76.178.16:3478",
-      username: "wuwei",
-      credential: "wien",
-    },
-  ],
-});
-
-// 监听消息接收事件
-WRTCEntity.onRecieveMessage = (msg) => {
-  addMessageToScreen(msg, false);
-  chatZone.scrollTop = chatZone.scrollHeight;
-  if (entireChat.style.display === "none") {
-    toggleChat();
+function requestPassword() {
+  const sessionPassword = sessionStorage.getItem("wrtc");
+  if (!sessionPassword) {
+    const promptPassword = prompt("请输入密码", "");
+    if (promptPassword != null && promptPassword != "") {
+      sessionStorage.setItem("wrtc", promptPassword);
+      password = promptPassword;
+    }
+  } else {
+    password = sessionPassword;
   }
-};
+  roomHash = urlSuffix + password;
+}
 
-// 监听track事件
-WRTCEntity.onTrack = (msg) => {
-  Snackbar.close();
-};
+//将本地视频重新定位到远程视频的左上方
+function rePositionLocalVideo() {
+  //获取远程视频的位置
+  const bounds = remoteVideo.getBoundingClientRect();
+  //设置本地视频的位置
+  localVideoMoveable.style.top = `${bounds.top}px`;
+  localVideoMoveable.style.left = `${bounds.left}px`;
+}
 
 // 开关音频
 function toggleAudio() {
@@ -101,6 +106,10 @@ function toggleChat() {
   }
 }
 
+function endCall() {
+  window.location.href = "/";
+}
+
 //将信息添加到页面上的聊天屏幕
 function addMessageToScreen(msg, isOwnMessage) {
   const msgContent = document.createElement("div");
@@ -120,6 +129,16 @@ function addMessageToScreen(msg, isOwnMessage) {
 chatInput.addEventListener("keypress", function (event) {
   if (event.key === "Enter") {
     event.preventDefault();
+    if (!WRTCEntity.DataChanel) {
+      Snackbar.show({
+        text: "必须先建立通话才能发送消息",
+        pos: "top-right",
+        duration: 3000,
+        customClass: "custom_snackbar",
+        actionText: "知道了",
+        actionTextColor: "#f66496",
+      });
+    }
     let msg = chatInput.value;
     msg = msg.replace(/</g, "&lt;").replace(/>/g, "&gt;");
     msg = msg.autoLink();
@@ -133,35 +152,78 @@ chatInput.addEventListener("keypress", function (event) {
   }
 });
 
-/* 提示用户共享URL */
-Snackbar.show({
-  text: "这是这次通话的加入链接: " + window.location.href,
-  actionText: "复制链接",
-  width: "750px",
-  pos: "top-center",
-  actionTextColor: "#616161",
-  duration: 10000000,
-  backgroundColor: "#fff",
-  onActionClick: function (element) {
-    const copyInput = document.createElement("input");
-    copyInput.value = window.location.href;
-    document.body.appendChild(copyInput);
-    copyInput.select();
-    document.execCommand("copy");
-    document.body.removeChild(copyInput);
-    Snackbar.close();
-  },
-});
-
-//将本地视频重新定位到远程视频的左上方
-function rePositionLocalVideo() {
-  //获取远程视频的位置
-  const bounds = remoteVideo.getBoundingClientRect();
-  //设置本地视频的位置
-  localVideoMoveable.style.top = `${bounds.top}px`;
-  localVideoMoveable.style.left = `${bounds.left}px`;
+//当套接字接收到房间已满的消息时调用
+function chatRoomFull() {
+  alert(
+    "聊天室已满。检查以确保您没有多个打开的标签，或者尝试使用新的会议室链接。"
+  );
+  //退出房间并重定向
+  window.location.href = "/";
 }
 
-rePositionLocalVideo();
+function bootstrap() {
+  urlType === "auth" && requestPassword();
 
-draggable(moveableEles[0]);
+  /* 提示用户共享URL */
+  Snackbar.show({
+    text: "这是这次通话的加入链接: " + window.location.href,
+    actionText: "复制链接",
+    actionTextColor: "#f66496",
+    pos: "top-center",
+    duration: 10000000,
+    customClass: "custom_snackbar",
+    onActionClick: function (element) {
+      const copyInput = document.createElement("input");
+      copyInput.value = window.location.href;
+      document.body.appendChild(copyInput);
+      copyInput.select();
+      document.execCommand("copy");
+      document.body.removeChild(copyInput);
+      Snackbar.close();
+    },
+  });
+
+  rePositionLocalVideo();
+
+  Array.from(moveableEles).forEach((element) => {
+    draggable(element);
+  });
+
+  setTimeout(() => {
+    fadeOut(localVideoText);
+  }, 5000);
+
+  webSocket.on("full", chatRoomFull);
+  // 新建WRTC实例  封装了WebRTC联通过程
+  window.WRTCEntity = new WRTC({
+    socket: webSocket,
+    room: roomHash,
+    localVideoId: "local_video",
+    remoteVideoId: "remote_video",
+    iceServers: [
+      { url: "stun:180.76.178.16:3478" },
+      {
+        url: "turn:180.76.178.16:3478",
+        username: "wuwei",
+        credential: "wien",
+      },
+    ],
+  });
+
+  // 监听消息接收事件
+  WRTCEntity.onRecieveMessage = (msg) => {
+    addMessageToScreen(msg, false);
+    chatZone.scrollTop = chatZone.scrollHeight;
+    if (entireChat.style.display === "none") {
+      toggleChat();
+    }
+  };
+
+  // 监听track事件
+  WRTCEntity.onTrack = (msg) => {
+    Snackbar.close();
+    fadeOut(remoteVideoText);
+  };
+}
+
+bootstrap();

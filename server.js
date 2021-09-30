@@ -11,12 +11,16 @@ const public = path.join(__dirname, "/public");
 
 app.use(express.static(public));
 
+app.get("/", (req, res) => {
+  res.sendFile(path.join(public, "call.html"));
+});
+
 app.get("/rtc/*", (req, res) => {
-  res.sendFile(path.join(public, "index.html"));
+  res.sendFile(path.join(public, "rtc.html"));
 });
 
 app.get("/authrtc/*", (req, res) => {
-  res.sendFile(path.join(public, "index.html"));
+  res.sendFile(path.join(public, "rtc.html"));
 });
 
 function logIt(msg) {
@@ -57,7 +61,7 @@ io.on("connection", function (socket) {
   });
 });
 
-const port = process.env.PORT || 3001;
+const port = process.env.PORT || 3000;
 httpServer.listen(port, () => {
   console.log(`http://localhost:${port}`);
 });
