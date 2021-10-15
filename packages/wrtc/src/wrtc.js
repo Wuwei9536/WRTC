@@ -4,14 +4,24 @@ import BackgroundReplacement from './backgroundReplacement/index';
 
 export default class WRTC {
   constructor(options) {
+    // rtc接口实例
     this.RTCPeerConnection = null;
+    // 数据通道实例
     this.DataChanel = null;
+    // 白板实例
     this.WHITEBOARD = null;
+    // 背景替换实例
+    this.BackgroundReplacement = null;
+
     // 媒体流
     this.webcamStream = null;
+    // 视频状态
     this.videoEnabled = true;
+    // 音频状态
     this.audioEnabled = true;
+    // 模式  用于区分共享屏幕还是普通视频流
     this.mode = 'camera';
+    // 处理options
     const {
       localVideoId = 'localVideo',
       remoteVideoId = 'remoteVideo',
@@ -23,9 +33,6 @@ export default class WRTC {
       mediaConstraint = { video: true, audio: true },
       maskImg,
     } = options;
-    this.br = null;
-    this.maskImg = maskImg;
-    this.backgroundCanvasId = backgroundCanvasId;
     // 本地video dom
     this.localVideo = document.getElementById(localVideoId);
     // 远端video dom
@@ -38,7 +45,13 @@ export default class WRTC {
     this.room = room;
     // 媒体约束
     this.mediaConstraint = mediaConstraint;
+    // 白板dom
     this.whiteboardId = whiteboardId;
+    // 背景图片dom
+    this.maskImg = maskImg;
+    // 背景canvas dom id
+    this.backgroundCanvasId = backgroundCanvasId;
+
     // 接受到对等端 『准备完成』的信号, 开始邀请通话
     socket.on('ready', this.invite);
     // 监听offer
@@ -96,30 +109,6 @@ export default class WRTC {
 
     this.WHITEBOARD = new WHITEBOARD({ dataChanel: this.DataChanel, whiteboardId: this.whiteboardId });
   };
-
-  // 替换背景 type: 'replace' | 'origin'
-  replaceBackground(type = 'replace') {
-    if (!this.br) {
-      this.br = new BackgroundReplacement({
-        localVideo: this.localVideo,
-        webcamStream: this.webcamStream,
-        maskImg: this.maskImg,
-        backgroundCanvasId: this.backgroundCanvasId,
-      });
-    }
-    if (this.br.state === 'inactive' && type === 'replace') {
-      this.br.restart();
-    }
-    if (type === 'origin' && this.br.state === 'active') {
-      this.br.stop();
-    }
-    if (this.RTCPeerConnection && this.RTCPeerConnection.connectionState === 'connected' && type === 'replace') {
-      this.switchStream(this.br.stream);
-    }
-    if (this.RTCPeerConnection && this.RTCPeerConnection.connectionState === 'connected' && type === 'origin') {
-      this.switchStream(this.webcamStream);
-    }
-  }
 
   // 发起呼叫
   invite = () => {
@@ -182,8 +171,8 @@ export default class WRTC {
       case 'connected':
         const config = this.RTCPeerConnection.getConfiguration();
         log('*** 连接配置为: ' + JSON.stringify(config));
-        if (this.br) {
-          this.switchStream(this.br.stream);
+        if (this.BackgroundReplacement) {
+          this.switchStream(this.BackgroundReplacement.stream);
         }
         break;
       case 'disconnected':
@@ -364,6 +353,30 @@ export default class WRTC {
     const w = this.WHITEBOARD.whiteboard.width;
     const h = this.WHITEBOARD.whiteboard.height;
     this.WHITEBOARD.drawLine(data.x0 * w, data.y0 * h, data.x1 * w, data.y1 * h, data.color);
+  }
+
+  // 替换背景 type: 'replace' | 'origin'
+  replaceBackground(type = 'replace') {
+    if (!this.BackgroundReplacement) {
+      this.BackgroundReplacement = new BackgroundReplacement({
+        localVideo: this.localVideo,
+        webcamStream: this.webcamStream,
+        maskImg: this.maskImg,
+        backgroundCanvasId: this.backgroundCanvasId,
+      });
+    }
+    if (this.BackgroundReplacement.state === 'inactive' && type === 'replace') {
+      this.BackgroundReplacement.restart();
+    }
+    if (type === 'origin' && this.BackgroundReplacement.state === 'active') {
+      this.BackgroundReplacement.stop();
+    }
+    if (this.RTCPeerConnection && this.RTCPeerConnection.connectionState === 'connected' && type === 'replace') {
+      this.switchStream(this.BackgroundReplacement.stream);
+    }
+    if (this.RTCPeerConnection && this.RTCPeerConnection.connectionState === 'connected' && type === 'origin') {
+      this.switchStream(this.webcamStream);
+    }
   }
 }
 

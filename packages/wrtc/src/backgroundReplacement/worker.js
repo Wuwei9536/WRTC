@@ -96,7 +96,17 @@ self.addEventListener('message', async (evt) => {
         );
         offCanvasContext.globalCompositeOperation = 'source-over';
       } else {
-        offCanvasContext.drawImage(maskImg, 0, 0);
+        offCanvasContext.drawImage(
+          maskImg,
+          0,
+          0,
+          maskImg.width,
+          maskImg.height,
+          0,
+          0,
+          offCanvas.width,
+          offCanvas.height
+        );
       }
       self.postMessage({ type: 'success' });
       break;

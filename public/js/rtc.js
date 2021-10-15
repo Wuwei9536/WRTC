@@ -12,15 +12,20 @@ const chatZone = document.getElementById("chat-zone");
 const moveableEles = document.getElementsByClassName("moveable");
 // 远端视频
 const remoteVideo = document.getElementById("remote_video");
+// 远端文字
 const remoteVideoText = document.getElementById("remote_video_text");
-
 // 本地视频容器
 const localVideoMoveable = document.getElementById("local_video_moveable");
+// 本地视频文字
 const localVideoText = document.getElementById("local_video_text");
 // 控制区
 const controlsArea = document.getElementById("controls_area");
+// 背景图片
 const maskImg = document.getElementById("maskImg");
-// const controlsIconTexts = document.getElementsByClassName("icon_text");
+// 背景替换状态
+let replaceBackgroundState = "origin";
+
+// 处理url判断是否需要密码
 const url = window.location.href;
 const urlPath = window.location.pathname;
 const urlType = urlPath
@@ -28,8 +33,8 @@ const urlType = urlPath
   .toLowerCase();
 const urlSuffix = url.substring(url.lastIndexOf("/") + 1).toLowerCase();
 let roomHash = urlSuffix;
-let replaceBackgroundState = "origin";
 
+// 要求输入密码
 function requestPassword() {
   const sessionPassword = sessionStorage.getItem("wrtc");
   if (!sessionPassword) {
@@ -123,6 +128,7 @@ function replaceBackground() {
   WRTCEntity.replaceBackground(replaceBackgroundState);
 }
 
+// 结束通话
 function endCall() {
   window.location.href = "/";
 }
@@ -178,17 +184,19 @@ function chatRoomFull() {
   window.location.href = "/";
 }
 
+// 展示背景图片
 function showBackground() {
   fadeIn(maskImg);
 }
 
+// 隐藏背景图片
 function hideBackground() {
   fadeOut(maskImg);
 }
 
+// 启动程序
 function bootstrap() {
   urlType === "auth" && requestPassword();
-
   /* 提示用户共享URL */
   Snackbar.show({
     text: "这是这次通话的加入链接: " + window.location.href,

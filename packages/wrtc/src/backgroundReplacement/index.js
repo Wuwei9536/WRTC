@@ -6,11 +6,15 @@ export default class BackgroundReplacement {
     const [localVideoTrack] = webcamStream.getVideoTracks();
     this.localVideo = localVideo;
     this.localImageCapture = new ImageCapture(localVideoTrack);
+
     this.maskImg = maskImg;
+    // web worker
     this.worker = null;
+    // 背景替换后用canvas代替video
     this.canvas = document.getElementById(backgroundCanvasId);
     this.canvas.width = this.localVideo.clientWidth;
     this.canvas.height = this.localVideo.clientHeight;
+    // 画布生成的视频流，用于传输
     this.stream = this.canvas.captureStream();
     // 是否背景替换中
     this.state = 'active';
