@@ -1,5 +1,6 @@
 import { log, warn, error } from './utils/log';
 import WHITEBOARD from './whiteBoard';
+import BackgroundReplacement from './backgroundReplacement/index';
 
 export default class WRTC {
   constructor(options) {
@@ -15,11 +16,16 @@ export default class WRTC {
       localVideoId = 'localVideo',
       remoteVideoId = 'remoteVideo',
       whiteboardId = 'whiteboard',
+      backgroundCanvasId = 'localCanvas',
       iceServers = [],
       socket,
       room = location.href,
       mediaConstraint = { video: true, audio: true },
+      maskImg,
     } = options;
+    this.br = null;
+    this.maskImg = maskImg;
+    this.backgroundCanvasId = backgroundCanvasId;
     // 本地video dom
     this.localVideo = document.getElementById(localVideoId);
     // 远端video dom
@@ -91,6 +97,30 @@ export default class WRTC {
     this.WHITEBOARD = new WHITEBOARD({ dataChanel: this.DataChanel, whiteboardId: this.whiteboardId });
   };
 
+  // 替换背景 type: 'replace' | 'origin'
+  replaceBackground(type = 'replace') {
+    if (!this.br) {
+      this.br = new BackgroundReplacement({
+        localVideo: this.localVideo,
+        webcamStream: this.webcamStream,
+        maskImg: this.maskImg,
+        backgroundCanvasId: this.backgroundCanvasId,
+      });
+    }
+    if (this.br.state === 'inactive' && type === 'replace') {
+      this.br.restart();
+    }
+    if (type === 'origin' && this.br.state === 'active') {
+      this.br.stop();
+    }
+    if (this.RTCPeerConnection && this.RTCPeerConnection.connectionState === 'connected' && type === 'replace') {
+      this.switchStream(this.br.stream);
+    }
+    if (this.RTCPeerConnection && this.RTCPeerConnection.connectionState === 'connected' && type === 'origin') {
+      this.switchStream(this.webcamStream);
+    }
+  }
+
   // 发起呼叫
   invite = () => {
     log('发起呼叫');
@@ -152,6 +182,9 @@ export default class WRTC {
       case 'connected':
         const config = this.RTCPeerConnection.getConfiguration();
         log('*** 连接配置为: ' + JSON.stringify(config));
+        if (this.br) {
+          this.switchStream(this.br.stream);
+        }
         break;
       case 'disconnected':
         break;
@@ -295,6 +328,7 @@ export default class WRTC {
   //   切换发送流
   switchStream = (stream) => {
     const videoTrack = stream.getVideoTracks()[0];
+    console.log('videoTrack: ', videoTrack);
     const sender = this.RTCPeerConnection.getSenders().find(function (s) {
       return s.track.kind === videoTrack.kind;
     });
@@ -313,7 +347,7 @@ export default class WRTC {
       }
     } else {
       try {
-        this.webcamStream = await navigator.mediaDevices.getUserMedia();
+        this.webcamStream = await this.getUserMedia();
         this.switchStream(this.webcamStream);
         this.mode = 'camera';
       } catch (err) {

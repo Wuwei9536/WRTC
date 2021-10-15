@@ -1,4 +1,8 @@
 import { terser } from 'rollup-plugin-terser';
+import webWorkerLoader from 'rollup-plugin-web-worker-loader';
+import image from '@rollup/plugin-image';
+import { nodeResolve } from '@rollup/plugin-node-resolve';
+
 export default [
   {
     input: 'src/index.js',
@@ -7,7 +11,7 @@ export default [
       format: 'umd',
       name: 'WRTC',
     },
-    plugins: [terser()],
+    plugins: [terser(), webWorkerLoader(), nodeResolve()],
   },
   {
     input: 'src/index.js',
@@ -15,7 +19,7 @@ export default [
       file: 'es/WRTC.js',
       format: 'es',
     },
-    plugins: [terser()],
+    plugins: [terser(), webWorkerLoader(), nodeResolve()],
   },
   {
     input: 'src/index.js',
@@ -24,6 +28,6 @@ export default [
       format: 'cjs',
       exports: 'default',
     },
-    plugins: [terser()],
+    plugins: [terser(), webWorkerLoader(), nodeResolve()],
   },
 ];

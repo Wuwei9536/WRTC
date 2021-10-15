@@ -18,7 +18,7 @@ video {
 }
 
 
-.remote_video_text{
+#remote_video_text{
   position: absolute;
   top: 45%;
   left: 50%;
@@ -27,7 +27,7 @@ video {
   color: #fff;
 }
 
-.remote_video_text::after{
+#remote_video_text::after{
   content: "";
   animation: dotdot 3s infinite;
 }
@@ -59,6 +59,12 @@ video {
 #local_video {
   width: 20vw;
   height: auto;
+  border-radius: 10px;
+  transform: scaleX(-1);
+  background: #16171a;
+}
+
+#local_canvas {
   border-radius: 10px;
   transform: scaleX(-1);
   background: #16171a;
@@ -239,4 +245,10 @@ video {
 
 .custom_snackbar button{
   font-weight: 500 !important;
+}
+
+#maskImg{
+  position: absolute;
+  top: -130px;
+  right: 50px;
 }

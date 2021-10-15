@@ -1,10 +1,9 @@
 // Files to cache
-var cacheName = "wrtc-v2";
+var cacheName = "wrtc-v3";
 var cacheFiles = [
-  "/utils/adapter.js",
-  "/utils/autolink.js",
-  "/utils/snackbar.min.js",
-  "/utils/common.js",
+  "/js/adapter.js",
+  "/js/autolink.js",
+  "/js/snackbar.min.js",
   "/fontawesome/css/font-face.min.css",
   "/fontawesome/css/free.min.css",
   "/fontawesome/css/v4-shims.min.css",
@@ -12,8 +11,6 @@ var cacheFiles = [
   "/fontawesome/webfonts/fa-solid-900.woff",
   "/icons/icon-256x256.png",
   "/images/logo.png",
-  "/css/call.css",
-  "/css/index.css",
   "/css/snackbar.min.css",
 ];
 

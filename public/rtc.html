@@ -18,12 +18,13 @@
 <body>
     <!-- 本地视频 -->
     <div class="moveable" id="local_video_moveable">
-        <video id="local_video" autoplay></video>
+        <video id="local_video" autoplay style="display: block;"></video>
+        <canvas id="local_canvas" style="display: none;"></canvas>
         <span id="local_video_text">可拖动</span>
     </div>
     <!-- 对等端视频 -->
     <video id="remote_video" autoplay></video>
-    <div class="remote_video_text">
+    <div id="remote_video_text">
         正在等待其他用户加入
     </div>
     <!-- 控制区 -->
@@ -51,6 +52,12 @@
         <div class="controls_item" onclick="toggleWhiteboard()">
             <i class="fas fa-chalkboard fa-xs"></i>
             <div id="whiteboard-text" class="icon_text">白板</div>
+        </div>
+        <div class="controls_item" onclick="replaceBackground()" onmouseenter="showBackground()"
+            onmouseleave="hideBackground()">
+            <i class="fas fa-exchange-alt fa-xs"></i>
+            <div id="whiteboard-text" class="icon_text">背景替换</div>
+            <img id="maskImg" src="/images/beach.jpg" width="200" height="auto" style="display: none;">
         </div>
         <div class="controls_item" onclick="endCall()">
             <i id="call_icon" class="fas fa-phone-slash fa-xs"></i>

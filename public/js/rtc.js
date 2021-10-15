@@ -19,6 +19,7 @@ const localVideoMoveable = document.getElementById("local_video_moveable");
 const localVideoText = document.getElementById("local_video_text");
 // 控制区
 const controlsArea = document.getElementById("controls_area");
+const maskImg = document.getElementById("maskImg");
 // const controlsIconTexts = document.getElementsByClassName("icon_text");
 const url = window.location.href;
 const urlPath = window.location.pathname;
@@ -27,6 +28,7 @@ const urlType = urlPath
   .toLowerCase();
 const urlSuffix = url.substring(url.lastIndexOf("/") + 1).toLowerCase();
 let roomHash = urlSuffix;
+let replaceBackgroundState = "origin";
 
 function requestPassword() {
   const sessionPassword = sessionStorage.getItem("wrtc");
@@ -106,6 +108,21 @@ function toggleChat() {
   }
 }
 
+// 背景替换
+function replaceBackground() {
+  Snackbar.show({
+    text: "正在处理，请稍候",
+    pos: "top-left",
+    duration: 5000,
+    customClass: "custom_snackbar",
+    actionText: "知道了",
+    actionTextColor: "#f66496",
+  });
+  replaceBackgroundState =
+    replaceBackgroundState === "origin" ? "replace" : "origin";
+  WRTCEntity.replaceBackground(replaceBackgroundState);
+}
+
 function endCall() {
   window.location.href = "/";
 }
@@ -161,6 +178,14 @@ function chatRoomFull() {
   window.location.href = "/";
 }
 
+function showBackground() {
+  fadeIn(maskImg);
+}
+
+function hideBackground() {
+  fadeOut(maskImg);
+}
+
 function bootstrap() {
   urlType === "auth" && requestPassword();
 
@@ -200,6 +225,8 @@ function bootstrap() {
     room: roomHash,
     localVideoId: "local_video",
     remoteVideoId: "remote_video",
+    backgroundCanvasId: "local_canvas",
+    maskImg: document.getElementById("maskImg"),
     iceServers: [
       { url: "stun:180.76.178.16:3478" },
       {
