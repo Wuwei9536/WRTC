@@ -42,7 +42,7 @@
             <div id="swap-text" class="icon_text">屏幕共享</div>
         </div>
         <div class="controls_item" onclick="toggleChat()">
-            <i id="chat-icon" class="fas fa-comment fa-xs"></i>
+            <i id="chat_icon" class="fas fa-comment fa-xs"></i>
             <div id="chat-text" class="icon_text">聊天</div>
         </div>
         <div class="controls_item" onclick="togglePictureInPicture()">
@@ -53,7 +53,11 @@
             <i class="fas fa-chalkboard fa-xs"></i>
             <div id="whiteboard-text" class="icon_text">白板</div>
         </div>
-        <div class="controls_item" onclick="replaceBackground()" onmouseenter="showBackground()"
+        <div class="controls_item" onclick="replaceBackground('virtual')">
+            <i class="fas fa-bold fa-xs"></i>
+            <div id="whiteboard-text" class="icon_text">虚化背景</div>
+        </div>
+        <div class="controls_item" onclick="replaceBackground('replace')" onmouseenter="showBackground()"
             onmouseleave="hideBackground()">
             <i class="fas fa-exchange-alt fa-xs"></i>
             <div id="whiteboard-text" class="icon_text">背景替换</div>

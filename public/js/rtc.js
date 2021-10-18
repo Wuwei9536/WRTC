@@ -22,8 +22,6 @@ const localVideoText = document.getElementById("local_video_text");
 const controlsArea = document.getElementById("controls_area");
 // 背景图片
 const maskImg = document.getElementById("maskImg");
-// 背景替换状态
-let replaceBackgroundState = "origin";
 
 // 处理url判断是否需要密码
 const url = window.location.href;
@@ -61,8 +59,8 @@ function rePositionLocalVideo() {
 // 开关音频
 function toggleAudio() {
   WRTCEntity.muteMicrophone();
-  const audioIcon = document.getElementById("mic-icon");
-  if (WRTCEntity.audioEnabled) {
+  const audioIcon = document.getElementById("audio_icon");
+  if (!WRTCEntity.audioEnabled) {
     audioIcon.classList.remove("fa-microphone");
     audioIcon.classList.add("fa-microphone-slash");
   } else {
@@ -74,8 +72,9 @@ function toggleAudio() {
 // 开关视频
 function toggleVideo() {
   WRTCEntity.pauseVideo();
-  const videoIcon = document.getElementById("video-icon");
-  if (!WRTCEntity.videoEabled) {
+  const videoIcon = document.getElementById("video_icon");
+  console.log("videoIcon: ", videoIcon);
+  if (!WRTCEntity.videoEnabled) {
     videoIcon.classList.remove("fa-video");
     videoIcon.classList.add("fa-video-slash");
   } else {
@@ -96,12 +95,16 @@ function toggleScreen() {
 
 // 开关白板功能
 function toggleWhiteboard() {
-  WRTCEntity.WHITEBOARD.toggleWhiteboard();
+  if (WRTCEntity.WHITEBOARD) {
+    WRTCEntity.WHITEBOARD.toggleWhiteboard();
+  } else {
+    alert("您必须建立会话之后才能开启白板功能");
+  }
 }
 
 // 开关聊天功能
 function toggleChat() {
-  const chatIcon = document.getElementById("chat-icon");
+  const chatIcon = document.getElementById("chat_icon");
   if (entireChat.style.display !== "none") {
     fadeOut(entireChat);
     chatIcon.classList.remove("fa-comment-slash");
@@ -114,18 +117,16 @@ function toggleChat() {
 }
 
 // 背景替换
-function replaceBackground() {
+function replaceBackground(type) {
   Snackbar.show({
     text: "正在处理，请稍候",
     pos: "top-left",
-    duration: 5000,
+    duration: 8000,
     customClass: "custom_snackbar",
     actionText: "知道了",
     actionTextColor: "#f66496",
   });
-  replaceBackgroundState =
-    replaceBackgroundState === "origin" ? "replace" : "origin";
-  WRTCEntity.replaceBackground(replaceBackgroundState);
+  WRTCEntity.replaceBackground(type);
 }
 
 // 结束通话

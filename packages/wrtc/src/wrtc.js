@@ -283,6 +283,7 @@ export default class WRTC {
 
   //  关闭是视频流
   pauseVideo = () => {
+    this.replaceBackground('origin');
     this.webcamStream.getTracks().forEach((track) => {
       if (track.kind === 'video') {
         track.enabled = !track.enabled;
@@ -355,7 +356,7 @@ export default class WRTC {
     this.WHITEBOARD.drawLine(data.x0 * w, data.y0 * h, data.x1 * w, data.y1 * h, data.color);
   }
 
-  // 替换背景 type: 'replace' | 'origin'
+  // 替换背景 type: 'replace' | 'origin' | 'virtual'
   replaceBackground(type = 'replace') {
     if (!this.BackgroundReplacement) {
       this.BackgroundReplacement = new BackgroundReplacement({
@@ -365,13 +366,15 @@ export default class WRTC {
         backgroundCanvasId: this.backgroundCanvasId,
       });
     }
-    if (this.BackgroundReplacement.state === 'inactive' && type === 'replace') {
+    const premode = this.BackgroundReplacement.mode;
+    this.BackgroundReplacement.mode = type;
+    if (this.BackgroundReplacement.state === 'inactive' && type !== 'origin') {
       this.BackgroundReplacement.restart();
     }
-    if (type === 'origin' && this.BackgroundReplacement.state === 'active') {
+    if ((type === premode || type === 'origin') && this.BackgroundReplacement.state === 'active') {
       this.BackgroundReplacement.stop();
     }
-    if (this.RTCPeerConnection && this.RTCPeerConnection.connectionState === 'connected' && type === 'replace') {
+    if (this.RTCPeerConnection && this.RTCPeerConnection.connectionState === 'connected' && type !== 'origin') {
       this.switchStream(this.BackgroundReplacement.stream);
     }
     if (this.RTCPeerConnection && this.RTCPeerConnection.connectionState === 'connected' && type === 'origin') {

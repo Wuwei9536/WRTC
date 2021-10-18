@@ -2,7 +2,7 @@ import WebWorker from 'web-worker:./worker';
 
 export default class BackgroundReplacement {
   constructor(options) {
-    const { localVideo, maskImg, webcamStream, backgroundCanvasId } = options;
+    const { localVideo, maskImg, webcamStream, backgroundCanvasId, mode } = options;
     const [localVideoTrack] = webcamStream.getVideoTracks();
     this.localVideo = localVideo;
     this.localImageCapture = new ImageCapture(localVideoTrack);
@@ -18,6 +18,7 @@ export default class BackgroundReplacement {
     this.stream = this.canvas.captureStream();
     // 是否背景替换中
     this.state = 'active';
+    this.mode = mode;
     this.initWorker();
   }
 
@@ -59,7 +60,7 @@ export default class BackgroundReplacement {
   renderCanvasImg = async () => {
     //  从本地视频track中拿到位图数据给worker线程
     await this.localImageCapture.grabFrame().then((videoBitMap) => {
-      this.worker.postMessage({ type: 'videoBitMap', bitMap: videoBitMap }, [videoBitMap]);
+      this.worker.postMessage({ type: 'videoBitMap', bitMap: videoBitMap, mode: this.mode }, [videoBitMap]);
     });
   };
 
@@ -86,6 +87,7 @@ export default class BackgroundReplacement {
 
   //   暂停背景替换，移出listener即可
   stop = () => {
+    console.log('stop');
     this.worker.removeEventListener('message', this.handleMessage);
     this.localVideo.style.display = 'block';
     this.canvas.style.display = 'none';
@@ -94,8 +96,17 @@ export default class BackgroundReplacement {
 
   //   重启背景替换
   restart = () => {
+    console.log('restart');
     this.initListener();
     this.renderCanvasImg();
     this.state = 'active';
   };
 }
+
+BackgroundReplacement.prototype.onSuccess = () => {
+  console.log('success');
+};
+
+BackgroundReplacement.prototype.onInit = () => {
+  console.log('init');
+};

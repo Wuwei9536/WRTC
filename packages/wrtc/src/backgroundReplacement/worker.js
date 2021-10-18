@@ -27,7 +27,6 @@ self.addEventListener('message', async (evt) => {
 
   switch (evtData.type) {
     case 'offCanvas':
-      // define offCanvas element
       offCanvas = evtData.canvas;
       offCanvasContext = offCanvas.getContext('2d');
       offTmpCanvas = new OffscreenCanvas(offCanvas.width, offCanvas.height);
@@ -52,7 +51,7 @@ self.addEventListener('message', async (evt) => {
         offCanvas.width,
         offCanvas.height
       );
-      console.log({ net });
+
       const segmentation = await net.segmentPerson(
         offTmpCanvasContext.getImageData(0, 0, offCanvas.width, offCanvas.height),
         {
@@ -68,7 +67,11 @@ self.addEventListener('message', async (evt) => {
       const backgroundColor = { r: 0, g: 0, b: 0, a: 255 };
       const backgroundDarkeningMask = bodyPix.toMask(segmentation, foregroundColor, backgroundColor);
 
-      if (backgroundDarkeningMask !== null) {
+      if (!backgroundDarkeningMask) {
+        offCanvasContext.drawImage(offTmpCanvas, 0, 0);
+        return;
+      }
+      if (evtData.mode === 'replace') {
         offCanvasContext.putImageData(backgroundDarkeningMask, 0, 0);
         offCanvasContext.globalCompositeOperation = 'source-in';
         offCanvasContext.drawImage(
@@ -95,18 +98,25 @@ self.addEventListener('message', async (evt) => {
           offCanvas.height
         );
         offCanvasContext.globalCompositeOperation = 'source-over';
-      } else {
+      } else if (evtData.mode === 'virtual') {
+        offCanvasContext.putImageData(backgroundDarkeningMask, 0, 0);
+        offCanvasContext.globalCompositeOperation = 'source-in';
+        offCanvasContext.filter = 'blur(10px)';
+        offCanvasContext.drawImage(offTmpCanvas, 0, 0);
+        offCanvasContext.globalCompositeOperation = 'destination-over';
+        offCanvasContext.filter = 'blur(0px)';
         offCanvasContext.drawImage(
-          maskImg,
+          evtBitMap,
           0,
           0,
-          maskImg.width,
-          maskImg.height,
+          evtBitMap.width,
+          evtBitMap.height,
           0,
           0,
           offCanvas.width,
           offCanvas.height
         );
+        offCanvasContext.globalCompositeOperation = 'source-over';
       }
       self.postMessage({ type: 'success' });
       break;
