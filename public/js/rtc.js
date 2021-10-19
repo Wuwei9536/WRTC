@@ -37,7 +37,9 @@ let roomHash = urlSuffix;
 function suggestChrome() {
   if (getBrowserName() !== "Chrome") {
     alert("该浏览器暂不支持此功能，建议使用Chrome浏览器以体验全部功能");
+    return true;
   }
+  return false;
 }
 
 // 要求输入密码
@@ -132,7 +134,7 @@ function toggleChat() {
 
 // 背景替换、虚化
 function replaceBackground(type) {
-  suggestChrome();
+  if (suggestChrome()) return;
   Snackbar.show({
     text: "正在处理，请稍候",
     pos: "top-left",
@@ -151,6 +153,10 @@ function endCall() {
 
 //将信息添加到页面上的聊天屏幕
 function addMessageToScreen(msg, isOwnMessage) {
+  if (!WRTCEntity.DataChanel) {
+    alert("请先建立会话后再发送消息");
+    return;
+  }
   const msgContent = document.createElement("div");
   msgContent.setAttribute("class", "message");
   msgContent.innerHTML = msg;
@@ -177,6 +183,7 @@ chatInput.addEventListener("keypress", function (event) {
         actionText: "知道了",
         actionTextColor: "#f66496",
       });
+      return;
     }
     let msg = chatInput.value;
     msg = msg.replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -205,6 +212,17 @@ function clickFileInput() {
 }
 
 function transFile() {
+  if (!WRTCEntity.DataChanel) {
+    Snackbar.show({
+      text: "必须先建立通话才能发送消息",
+      pos: "top-right",
+      duration: 3000,
+      customClass: "custom_snackbar",
+      actionText: "知道了",
+      actionTextColor: "#f66496",
+    });
+    return;
+  }
   const file = fileInput.files[0];
   console.log("file: ", file);
   WRTCEntity.sendFile(file);

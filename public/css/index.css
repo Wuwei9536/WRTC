@@ -223,6 +223,7 @@ video {
 
 .message a {
   text-decoration: underline;
+  color: cornflowerblue;
 }
 
 @keyframes fadeInBottom {

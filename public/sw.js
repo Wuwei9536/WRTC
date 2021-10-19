@@ -47,7 +47,7 @@ self.addEventListener("fetch", function (e) {
 });
 
 self.addEventListener("activate", function (event) {
-  var cacheWhitelist = ["wrtc-v2"];
+  var cacheWhitelist = ["wrtc-v3"];
 
   event.waitUntil(
     caches.keys().then(function (keyList) {

@@ -11,7 +11,15 @@ export default [
       format: 'umd',
       name: 'WRTC',
     },
-    plugins: [terser(), webWorkerLoader(), nodeResolve()],
+    plugins: [
+      terser({
+        compress: {
+          drop_console: false,
+        },
+      }),
+      webWorkerLoader(),
+      nodeResolve(),
+    ],
   },
   {
     input: 'src/index.js',
@@ -19,7 +27,15 @@ export default [
       file: 'es/WRTC.js',
       format: 'es',
     },
-    plugins: [terser(), webWorkerLoader(), nodeResolve()],
+    plugins: [
+      terser({
+        compress: {
+          drop_console: true,
+        },
+      }),
+      webWorkerLoader(),
+      nodeResolve(),
+    ],
   },
   {
     input: 'src/index.js',
@@ -28,6 +44,14 @@ export default [
       format: 'cjs',
       exports: 'default',
     },
-    plugins: [terser(), webWorkerLoader(), nodeResolve()],
+    plugins: [
+      terser({
+        compress: {
+          drop_console: true,
+        },
+      }),
+      webWorkerLoader(),
+      nodeResolve(),
+    ],
   },
 ];

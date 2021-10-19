@@ -102,11 +102,11 @@ export default class WRTC {
     //处理不同的dataChannel类型
     this.DataChanel.onmessage = (event) => {
       console.log('event: ', event);
-      if (event.data instanceof Blob) {
+      if (event.data instanceof Blob || event.data instanceof ArrayBuffer) {
         console.log('blob');
         this.receivedBuffer.push(event.data);
         //更新已经收到的数据的长度
-        this.receivedSize += event.data.size;
+        this.receivedSize += event.data.byteLength || event.data.size;
         //如果接收到的字节数与文件大小相同，则创建文件
         if (this.receivedSize === this.fileSize) {
           //创建文件
@@ -426,6 +426,7 @@ export default class WRTC {
     const fileReader = new FileReader();
     this.sendData({ type: 'file', fileName: file.name, fileSize: file.size }); //发送数据
     fileReader.onload = (e) => {
+      console.log('e: ', e);
       //当数据被加载时触发该事件
       this.DataChanel.send(e.target.result);
       offset += e.target.result.byteLength; //更改已读数据的偏移量
