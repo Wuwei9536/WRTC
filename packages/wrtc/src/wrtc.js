@@ -50,6 +50,10 @@ export default class WRTC {
     this.maskImg = maskImg;
     // 背景canvas dom id
     this.backgroundCanvasId = backgroundCanvasId;
+    this.receivedBuffer = []; //存放数据的数组
+    this.receivedSize = 0; //数据大小
+    this.fileSize = 0;
+    this.fileName = '';
 
     // 接受到对等端 『准备完成』的信号, 开始邀请通话
     socket.on('ready', this.invite);
@@ -88,6 +92,8 @@ export default class WRTC {
       negotiated: true,
       // both peers must have same id
       id: 0,
+      ordered: true,
+      maxRetransmits: 30,
     });
     //成功打开dataChannel时调用
     this.DataChanel.onopen = (event) => {
@@ -95,12 +101,43 @@ export default class WRTC {
     };
     //处理不同的dataChannel类型
     this.DataChanel.onmessage = (event) => {
+      console.log('event: ', event);
+      if (event.data instanceof Blob) {
+        console.log('blob');
+        this.receivedBuffer.push(event.data);
+        //更新已经收到的数据的长度
+        this.receivedSize += event.data.size;
+        //如果接收到的字节数与文件大小相同，则创建文件
+        if (this.receivedSize === this.fileSize) {
+          //创建文件
+          const received = new Blob(this.receivedBuffer, { type: 'application/octet-stream' });
+          console.log('received: ', received);
+          //生成下载地址
+          // const downloadAnchor = document.createElement('a');
+          // downloadAnchor.href = URL.createObjectURL(received);
+          // downloadAnchor.download = this.fileName;
+          // downloadAnchor.textContent = `Click to download '${this.fileName}' (${this.fileSize} bytes)`;
+          // downloadAnchor.style.display = 'block';
+          // document.body.appendChild(downloadAnchor);
+
+          this.onRecieveFile({ url: URL.createObjectURL(received), fileName: this.fileName, fileSize: this.fileSize });
+          //将buffer和 size 清空，为下一次传文件做准备
+          this.receivedBuffer = [];
+          this.receivedSize = 0;
+          this.fileSize = 0;
+          this.fileName = '';
+        }
+        return;
+      }
       const receivedData = JSON.parse(event.data);
       log({ receivedData });
       const dataType = receivedData.type;
       const cleanedMessage = receivedData.data;
       if (dataType === 'whiteboard') {
         this.handleRecieveWhiteboard(cleanedMessage);
+      } else if (dataType === 'file') {
+        this.fileName = receivedData.fileName;
+        this.fileSize = receivedData.fileSize;
       } else {
         this.onRecieveMessage(cleanedMessage);
       }
@@ -382,6 +419,29 @@ export default class WRTC {
       this.switchStream(this.webcamStream);
     }
   }
+
+  sendFile = (file) => {
+    let offset = 0; //偏移量
+    const chunkSize = 16384; //每次传输的块大小
+    const fileReader = new FileReader();
+    this.sendData({ type: 'file', fileName: file.name, fileSize: file.size }); //发送数据
+    fileReader.onload = (e) => {
+      //当数据被加载时触发该事件
+      this.DataChanel.send(e.target.result);
+      offset += e.target.result.byteLength; //更改已读数据的偏移量
+      if (offset < file.size) {
+        //如果文件没有被读完
+        readSlice(offset); // 读取数据
+      }
+    };
+
+    var readSlice = (o) => {
+      const slice = file.slice(offset, o + chunkSize); //计算数据位置
+      fileReader.readAsArrayBuffer(slice); //读取 16K 数据
+    };
+
+    readSlice(0); //开始读取数据
+  };
 }
 
 // 触发静音事件时触发
@@ -404,4 +464,8 @@ WRTC.prototype.onRecieveMessage = (msg) => {
 
 WRTC.prototype.onTrack = (event) => {
   console.log('event: ', event);
+};
+
+WRTC.prototype.onRecieveFile = (url) => {
+  console.log('url: ', url);
 };

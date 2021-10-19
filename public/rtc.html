@@ -43,7 +43,7 @@
         </div>
         <div class="controls_item" onclick="toggleChat()">
             <i id="chat_icon" class="fas fa-comment fa-xs"></i>
-            <div id="chat-text" class="icon_text">聊天</div>
+            <div id="chat-text" class="icon_text">聊天/文件</div>
         </div>
         <div class="controls_item" onclick="togglePictureInPicture()">
             <i class="fas fa-external-link-alt fa-xs"></i>
@@ -74,6 +74,8 @@
         </div>
         <form class="compose">
             <input id="chat-input" type="text" placeholder="输入消息" />
+            <i class="fas fa-file-upload fa-md" onclick="clickFileInput()"></i>
+            <input id="file_input" type="file" hidden onchange="transFile()" />
         </form>
     </div>
     <!-- 白板区 -->

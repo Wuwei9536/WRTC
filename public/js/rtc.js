@@ -22,6 +22,8 @@ const localVideoText = document.getElementById("local_video_text");
 const controlsArea = document.getElementById("controls_area");
 // 背景图片
 const maskImg = document.getElementById("maskImg");
+// 文件传输input
+const fileInput = document.getElementById("file_input");
 
 // 处理url判断是否需要密码
 const url = window.location.href;
@@ -151,7 +153,7 @@ function endCall() {
 function addMessageToScreen(msg, isOwnMessage) {
   const msgContent = document.createElement("div");
   msgContent.setAttribute("class", "message");
-  msgContent.textContent = msg;
+  msgContent.innerHTML = msg;
   const msgItem = document.createElement("div");
   msgItem.appendChild(msgContent);
   if (isOwnMessage) {
@@ -196,6 +198,19 @@ function chatRoomFull() {
   );
   //退出房间并重定向
   window.location.href = "/";
+}
+
+function clickFileInput() {
+  fileInput.click();
+}
+
+function transFile() {
+  const file = fileInput.files[0];
+  console.log("file: ", file);
+  WRTCEntity.sendFile(file);
+  const fileUrl = URL.createObjectURL(file);
+  const msg = `<a href=${fileUrl} download=${file.name} >${file.name}</a>`;
+  addMessageToScreen(msg, true);
 }
 
 // 展示背景图片
@@ -273,6 +288,15 @@ function bootstrap() {
     }
   };
 
+  // 监听消息接收事件
+  WRTCEntity.onRecieveFile = ({ url, fileName }) => {
+    const msg = `<a href=${url} download=${fileName} >${fileName}</a>`;
+    addMessageToScreen(msg);
+    chatZone.scrollTop = chatZone.scrollHeight;
+    if (entireChat.style.display === "none") {
+      toggleChat();
+    }
+  };
   // 监听track事件
   WRTCEntity.onTrack = (msg) => {
     Snackbar.close();

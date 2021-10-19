@@ -252,3 +252,11 @@ video {
   top: -130px;
   right: 50px;
 }
+
+.fa-file-upload{
+  font-size: 1.5rem;
+  color: gray;
+  position: absolute;
+  right: 25px;
+  top: 18px;
+}
