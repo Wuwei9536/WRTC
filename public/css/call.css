@@ -1,6 +1,8 @@
 body,
 html {
   background-color: #16171a;
+  width: 100%;
+  height: 100%;
 }
 
 body,
@@ -17,7 +19,10 @@ button {
 form {
   padding: 16px;
   width: 320px;
-  margin: 0 auto;
+  position: absolute;
+  left: 50%;
+  top: 35%;
+  transform: translate(-50%,-50%);
 }
 
 .segment {
@@ -156,4 +161,11 @@ button.red {
   to {
     filter: hue-rotate(-1turn);
   }
+}
+
+canvas {
+  position: absolute;
+  display: block;
+  width: 100%;
+  height: 100%;
 }
