@@ -32,6 +32,12 @@ const urlType = urlPath
 const urlSuffix = url.substring(url.lastIndexOf("/") + 1).toLowerCase();
 let roomHash = urlSuffix;
 
+function suggestChrome() {
+  if (getBrowserName() !== "Chrome") {
+    alert("该浏览器暂不支持此功能，建议使用Chrome浏览器以体验全部功能");
+  }
+}
+
 // 要求输入密码
 function requestPassword() {
   const sessionPassword = sessionStorage.getItem("wrtc");
@@ -85,6 +91,12 @@ function toggleVideo() {
 
 // 开关画中画模式
 function togglePictureInPicture() {
+  if (getBrowserName() === "Firefox") {
+    alert(
+      "火狐浏览器请使用自带的画中画功能，鼠标悬浮于视频上方可见画中画功能按钮"
+    );
+    return;
+  }
   WRTCEntity.togglePictureInPicture();
 }
 
@@ -116,8 +128,9 @@ function toggleChat() {
   }
 }
 
-// 背景替换
+// 背景替换、虚化
 function replaceBackground(type) {
+  suggestChrome();
   Snackbar.show({
     text: "正在处理，请稍候",
     pos: "top-left",
@@ -216,6 +229,11 @@ function bootstrap() {
       Snackbar.close();
     },
   });
+
+  if (getBrowserName() !== "Chrome") {
+    remoteVideoText.innerText =
+      "正在等待其他用户加入,建议使用Chrome浏览器以体验全部功能";
+  }
 
   rePositionLocalVideo();
 

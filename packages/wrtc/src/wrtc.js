@@ -12,7 +12,6 @@ export default class WRTC {
     this.WHITEBOARD = null;
     // 背景替换实例
     this.BackgroundReplacement = null;
-
     // 媒体流
     this.webcamStream = null;
     // 视频状态
@@ -283,7 +282,9 @@ export default class WRTC {
 
   //  关闭是视频流
   pauseVideo = () => {
-    this.replaceBackground('origin');
+    if (this.BackgroundReplacement && this.BackgroundReplacement.state === 'active') {
+      this.replaceBackground('origin');
+    }
     this.webcamStream.getTracks().forEach((track) => {
       if (track.kind === 'video') {
         track.enabled = !track.enabled;

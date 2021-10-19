@@ -76,3 +76,19 @@ function throttle(callback, delay) {
     }
   };
 }
+
+//使用用户代理获取浏览器的名称
+function getBrowserName() {
+  if (window.navigator.userAgent.indexOf("MSIE") !== -1) {
+    return "MSIE";
+  } else if (window.navigator.userAgent.indexOf("Firefox") !== -1) {
+    return "Firefox";
+  } else if (window.navigator.userAgent.indexOf("Opera") !== -1) {
+    return "Opera";
+  } else if (window.navigator.userAgent.indexOf("Chrome") !== -1) {
+    return "Chrome";
+  } else if (window.navigator.userAgent.indexOf("Safari") !== -1) {
+    return "Safari";
+  }
+  return "UnKnown";
+}
