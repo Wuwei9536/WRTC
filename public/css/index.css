@@ -5,6 +5,8 @@ body {
   margin: 0;
   padding: 0;
   background-color: #16171b;
+  min-height: 780px;
+  position: relative;
 }
 
 /* 视频区 */
@@ -47,6 +49,7 @@ video {
   left: 50%;
   -ms-transform: translate(-50%, -50%);
   transform: translate(-50%, -50%);
+  border-radius: 10px;
 }
 
 

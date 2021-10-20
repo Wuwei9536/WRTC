@@ -1,6 +1,7 @@
 import { log, warn, error } from './utils/log';
 import WHITEBOARD from './whiteBoard';
 import BackgroundReplacement from './backgroundReplacement/index';
+import Recorder from './recorder';
 
 export default class WRTC {
   constructor(options) {
@@ -12,8 +13,12 @@ export default class WRTC {
     this.WHITEBOARD = null;
     // 背景替换实例
     this.BackgroundReplacement = null;
+    // 录制实例
+    this.Recorder = null;
     // 媒体流
     this.webcamStream = null;
+    // 远端流
+    this.remoteStream = null;
     // 视频状态
     this.videoEnabled = true;
     // 音频状态
@@ -112,13 +117,6 @@ export default class WRTC {
           //创建文件
           const received = new Blob(this.receivedBuffer, { type: 'application/octet-stream' });
           console.log('received: ', received);
-          //生成下载地址
-          // const downloadAnchor = document.createElement('a');
-          // downloadAnchor.href = URL.createObjectURL(received);
-          // downloadAnchor.download = this.fileName;
-          // downloadAnchor.textContent = `Click to download '${this.fileName}' (${this.fileSize} bytes)`;
-          // downloadAnchor.style.display = 'block';
-          // document.body.appendChild(downloadAnchor);
 
           this.onRecieveFile({ url: URL.createObjectURL(received), fileName: this.fileName, fileSize: this.fileSize });
           //将buffer和 size 清空，为下一次传文件做准备
@@ -144,6 +142,28 @@ export default class WRTC {
     };
 
     this.WHITEBOARD = new WHITEBOARD({ dataChanel: this.DataChanel, whiteboardId: this.whiteboardId });
+  };
+
+  // 录制
+  record = (timeSlice) => {
+    if (!this.remoteStream) {
+      return;
+    }
+    this.Recorder = new Recorder({
+      stream: this.remoteStream,
+    });
+    this.Recorder.start(timeSlice);
+  };
+
+  // 停止录制
+  stopRecord = () => {
+    const blob = this.Recorder.stop();
+    //生成下载地址
+    const downloadAnchor = document.createElement('a');
+    downloadAnchor.href = URL.createObjectURL(blob);
+    downloadAnchor.download = '录制文件';
+    downloadAnchor.click();
+    this.Recorder = null;
   };
 
   // 发起呼叫
@@ -230,6 +250,7 @@ export default class WRTC {
   handleTrackEvent = (event) => {
     log('Track event: ', event);
     this.remoteVideo.srcObject = event.streams[0];
+    this.remoteStream = event.streams[0];
     this.onTrack(event);
   };
 

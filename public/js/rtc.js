@@ -24,6 +24,8 @@ const controlsArea = document.getElementById("controls_area");
 const maskImg = document.getElementById("maskImg");
 // 文件传输input
 const fileInput = document.getElementById("file_input");
+// 录制文字
+const recordText = document.getElementById("record_text");
 
 // 处理url判断是否需要密码
 const url = window.location.href;
@@ -63,7 +65,9 @@ function rePositionLocalVideo() {
   const bounds = remoteVideo.getBoundingClientRect();
   //设置本地视频的位置
   localVideoMoveable.style.top = `${bounds.top}px`;
-  localVideoMoveable.style.left = `${bounds.left}px`;
+  localVideoMoveable.style.left = `${
+    bounds.left - localVideoMoveable.clientWidth
+  }px`;
 }
 
 // 开关音频
@@ -231,6 +235,26 @@ function transFile() {
   addMessageToScreen(msg, true);
 }
 
+function record() {
+  if (!WRTCEntity.RTCPeerConnection) {
+    alert("必须先建立通话才能录制远端视频");
+  }
+  if (!WRTCEntity.Recorder) {
+    WRTCEntity.record(1000);
+    recordText.textContent = "停止";
+    Snackbar.show({
+      text: "开始录制",
+      pos: "top-center",
+      duration: 2000,
+      customClass: "custom_snackbar",
+      actionText: "好的",
+      actionTextColor: "#f66496",
+    });
+  } else {
+    WRTCEntity.stopRecord();
+    recordText.textContent = "录制";
+  }
+}
 // 展示背景图片
 function showBackground() {
   fadeIn(maskImg);
@@ -239,6 +263,19 @@ function showBackground() {
 // 隐藏背景图片
 function hideBackground() {
   fadeOut(maskImg);
+}
+
+function showFps() {
+  const stats = new Stats();
+  stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
+  document.body.appendChild(stats.dom);
+
+  function animate() {
+    stats.update();
+    requestAnimationFrame(animate);
+  }
+
+  requestAnimationFrame(animate);
 }
 
 // 启动程序
@@ -287,6 +324,7 @@ function bootstrap() {
     remoteVideoId: "remote_video",
     backgroundCanvasId: "local_canvas",
     maskImg: document.getElementById("maskImg"),
+    mediaConstraint: { audio: true, video: { width: 1280, height: 720 } },
     iceServers: [
       { url: "stun:180.76.178.16:3478" },
       {
@@ -320,6 +358,8 @@ function bootstrap() {
     Snackbar.close();
     fadeOut(remoteVideoText);
   };
+
+  showFps();
 }
 
 bootstrap();

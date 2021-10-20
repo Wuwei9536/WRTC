@@ -55,13 +55,17 @@
         </div>
         <div class="controls_item" onclick="replaceBackground('virtual')">
             <i class="fas fa-bold fa-xs"></i>
-            <div id="whiteboard-text" class="icon_text">虚化背景</div>
+            <div class="icon_text">虚化背景</div>
         </div>
         <div class="controls_item" onclick="replaceBackground('replace')" onmouseenter="showBackground()"
             onmouseleave="hideBackground()">
             <i class="fas fa-exchange-alt fa-xs"></i>
-            <div id="whiteboard-text" class="icon_text">背景替换</div>
+            <div class="icon_text">背景替换</div>
             <img id="maskImg" src="/images/beach.jpg" width="200" height="auto" style="display: none;">
+        </div>
+        <div class="controls_item" onclick="record()">
+            <i class="fas fa-record-vinyl fa-xs"></i>
+            <div id="record_text" class="icon_text">录制</div>
         </div>
         <div class="controls_item" onclick="endCall()">
             <i id="call_icon" class="fas fa-phone-slash fa-xs"></i>
@@ -83,12 +87,13 @@
         抱歉，您的浏览器不支持canvas元素
     </canvas>
 
-    <script src="/js/snackbar.min.js"></script>
-    <script src="/js/autolink.js"></script>
+    <script src="/lib/snackbar.min.js"></script>
+    <script src="/lib/autolink.js"></script>
     <script src="/js/common.js"></script>
-    <script src="/js/adapter.js"></script>
+    <script src="/lib/adapter.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script src="/js/WRTC.js"></script>
+    <script src="/lib/stats.min.js"></script>
     <script src="/js/rtc.js"></script>
     <script>
         if ("serviceWorker" in navigator) {
