@@ -1,9 +1,9 @@
 // Files to cache
 var cacheName = "wrtc-v3";
 var cacheFiles = [
-  "/js/adapter.js",
-  "/js/autolink.js",
-  "/js/snackbar.min.js",
+  "/lib/adapter.js",
+  "/lib/autolink.js",
+  "/lib/snackbar.min.js",
   "/fontawesome/css/font-face.min.css",
   "/fontawesome/css/free.min.css",
   "/fontawesome/css/v4-shims.min.css",
