@@ -63,11 +63,18 @@ function requestPassword() {
 function rePositionLocalVideo() {
   //获取远程视频的位置
   const bounds = remoteVideo.getBoundingClientRect();
-  //设置本地视频的位置
-  localVideoMoveable.style.top = `${bounds.top}px`;
-  localVideoMoveable.style.left = `${
-    bounds.left - localVideoMoveable.clientWidth
-  }px`;
+  if (isMobile()) {
+    localVideoMoveable.style.top = `${
+      bounds.top - localVideoMoveable.clientHeight
+    }px`;
+    localVideoMoveable.style.left = `${bounds.left}px`;
+  } else {
+    //设置本地视频的位置
+    localVideoMoveable.style.top = `${bounds.top}px`;
+    localVideoMoveable.style.left = `${
+      bounds.left - localVideoMoveable.clientWidth
+    }px`;
+  }
 }
 
 // 开关音频
@@ -174,31 +181,35 @@ function addMessageToScreen(msg, isOwnMessage) {
   chatZone.appendChild(msgItem);
 }
 
+function sendMessage() {
+  if (!WRTCEntity.DataChanel) {
+    Snackbar.show({
+      text: "必须先建立通话才能发送消息",
+      pos: "top-right",
+      duration: 3000,
+      customClass: "custom_snackbar",
+      actionText: "知道了",
+      actionTextColor: "#f66496",
+    });
+    return;
+  }
+  let msg = chatInput.value;
+  msg = msg.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  msg = msg.autoLink();
+  WRTCEntity.sendData({
+    type: "msg",
+    data: msg,
+  });
+  addMessageToScreen(msg, true);
+  chatZone.scrollTop = chatZone.scrollHeight;
+  chatInput.value = "";
+}
+
 // 监听输入框 键盘 enter
 chatInput.addEventListener("keypress", function (event) {
   if (event.key === "Enter") {
     event.preventDefault();
-    if (!WRTCEntity.DataChanel) {
-      Snackbar.show({
-        text: "必须先建立通话才能发送消息",
-        pos: "top-right",
-        duration: 3000,
-        customClass: "custom_snackbar",
-        actionText: "知道了",
-        actionTextColor: "#f66496",
-      });
-      return;
-    }
-    let msg = chatInput.value;
-    msg = msg.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-    msg = msg.autoLink();
-    WRTCEntity.sendData({
-      type: "msg",
-      data: msg,
-    });
-    addMessageToScreen(msg, true);
-    chatZone.scrollTop = chatZone.scrollHeight;
-    chatInput.value = "";
+    sendMessage();
   }
 });
 
@@ -316,6 +327,10 @@ function bootstrap() {
   }, 5000);
 
   webSocket.on("full", chatRoomFull);
+
+  const videoConstraint = isMobile()
+    ? { width: 480, height: 480 }
+    : { width: 1280, height: 720 };
   // 新建WRTC实例  封装了WebRTC联通过程
   window.WRTCEntity = new WRTC({
     socket: webSocket,
@@ -324,7 +339,7 @@ function bootstrap() {
     remoteVideoId: "remote_video",
     backgroundCanvasId: "local_canvas",
     maskImg: document.getElementById("maskImg"),
-    mediaConstraint: { audio: true, video: { width: 1280, height: 720 } },
+    mediaConstraint: { audio: true, video: videoConstraint },
     iceServers: [
       { url: "stun:180.76.178.16:3478" },
       {
@@ -359,7 +374,7 @@ function bootstrap() {
     fadeOut(remoteVideoText);
   };
 
-  showFps();
+  !isMobile() && showFps();
 }
 
 bootstrap();

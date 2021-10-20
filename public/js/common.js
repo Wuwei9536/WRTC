@@ -92,3 +92,7 @@ function getBrowserName() {
   }
   return "UnKnown";
 }
+
+function isMobile() {
+  return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+}

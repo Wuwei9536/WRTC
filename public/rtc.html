@@ -78,9 +78,12 @@
         </div>
         <form class="compose">
             <input id="chat-input" type="text" placeholder="输入消息" />
+            <i class="fas fa-paper-plane fa-md" onclick="sendMessage()"></i>
             <i class="fas fa-file-upload fa-md" onclick="clickFileInput()"></i>
+            <i class="fas fa-times fa-md" onclick="toggleChat()"></i>
             <input id="file_input" type="file" hidden onchange="transFile()" />
         </form>
+
     </div>
     <!-- 白板区 -->
     <canvas id="whiteboard" style="display: none;" class="whiteboard" width="600" height="600">

@@ -264,3 +264,93 @@ video {
   right: 25px;
   top: 18px;
 }
+
+.fa-paper-plane{
+  display: none !important;
+}
+
+.fa-times{
+  display: none !important;
+}
+
+
+@media (max-width: 640px) {
+  html,
+  body {
+    width: 100%;
+    height: 100%;
+    font-size: 1em;
+    min-height: auto;
+  }
+
+  #remote_video {
+    width: 100vw;
+    height: auto;
+    border-radius: 10px;
+  }
+
+  #local_video {
+    width: 30vw;
+    height: auto;
+    border-radius: 10px;
+    transform: scaleX(-1);
+    background: #16171a;
+  }
+
+  .controls_area{
+    width: 100%;
+    flex-wrap: wrap;
+    gap: 10px;
+    height: 125px;
+    bottom: 0;
+    box-sizing:border-box;
+    padding: 15px;
+  }
+
+  .controls_item{
+    font-size: 0.75em;
+    width: 15vw;
+  }
+
+  .controls_item > i {
+    font-size: 1rem;
+  }
+
+  #chat {
+    height: 100%;
+    width: 100vw;
+  }
+
+  #chat-zone{
+    width: 100vw;
+  }
+
+  .compose {
+    width: 100vw;
+    margin: 0;
+  }
+
+  .fa-paper-plane{
+    font-size: 1.5rem;
+    color: gray;
+    position: absolute;
+    right: 70px;
+    top: 18px;
+  }
+
+  .fa-times{
+    font-size: 1.5rem;
+    color: gray;
+    position: absolute;
+    right: 10px;
+    top: 18px;
+  }
+
+  .fa-file-upload{
+    right: 35px;
+  }
+
+  .snackbar-container .action{
+    white-space: nowrap;
+  }
+}

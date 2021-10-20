@@ -107,7 +107,7 @@ let init = function (num) {
   draw();
 };
 
-window.addEventListener("load", init(80));
+window.addEventListener("load", init(isMobile() ? 30 : 80));
 
 window.onmousemove = function (e) {
   e = e || window.event;
