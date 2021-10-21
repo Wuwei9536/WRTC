@@ -26,6 +26,7 @@ const maskImg = document.getElementById("maskImg");
 const fileInput = document.getElementById("file_input");
 // 录制文字
 const recordText = document.getElementById("record_text");
+const shareScreenText = document.getElementById("swap_text");
 
 // 处理url判断是否需要密码
 const url = window.location.href;
@@ -121,6 +122,7 @@ function togglePictureInPicture() {
 
 // 开关屏幕共享模式
 function toggleScreen() {
+  shareScreenText.textContent = "屏幕共享";
   WRTCEntity.swap();
 }
 
@@ -377,6 +379,14 @@ function bootstrap() {
   WRTCEntity.onTrack = (msg) => {
     Snackbar.close();
     fadeOut(remoteVideoText);
+  };
+
+  WRTCEntity.onGetDisplayMedia = () => {
+    shareScreenText.textContent = "停止共享";
+  };
+
+  WRTCEntity.onGetUserMediaError = () => {
+    // alert("")
   };
 
   !isMobile() && showFps();

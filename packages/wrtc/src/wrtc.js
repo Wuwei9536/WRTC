@@ -183,8 +183,10 @@ export default class WRTC {
     try {
       this.webcamStream = await navigator.mediaDevices.getUserMedia(this.mediaConstraint);
       this.localVideo.srcObject = this.webcamStream;
+      this.onGetUserMedia();
       return this.webcamStream;
     } catch (err) {
+      this.onGetUserMediaError();
       error(err);
     }
   };
@@ -195,8 +197,10 @@ export default class WRTC {
     try {
       this.webcamStream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: false });
       this.localVideo.srcObject = this.webcamStream;
+      this.onGetDisplayMedia();
       return this.webcamStream;
     } catch (err) {
+      this.onGetDisplayMediaError();
       error(err);
     }
   };
@@ -376,6 +380,9 @@ export default class WRTC {
 
   //   切换发送流
   switchStream = (stream) => {
+    if (!this.RTCPeerConnection) {
+      return;
+    }
     const videoTrack = stream.getVideoTracks()[0];
     console.log('videoTrack: ', videoTrack);
     const sender = this.RTCPeerConnection.getSenders().find(function (s) {
@@ -389,16 +396,16 @@ export default class WRTC {
     if (this.mode === 'camera') {
       try {
         this.webcamStream = await this.getDisplayMedia();
-        this.switchStream(this.webcamStream);
         this.mode = 'screen';
+        this.switchStream(this.webcamStream);
       } catch (err) {
         log(err);
       }
     } else {
       try {
         this.webcamStream = await this.getUserMedia();
-        this.switchStream(this.webcamStream);
         this.mode = 'camera';
+        this.switchStream(this.webcamStream);
       } catch (err) {
         log(err);
       }
@@ -491,3 +498,11 @@ WRTC.prototype.onTrack = (event) => {
 WRTC.prototype.onRecieveFile = (url) => {
   console.log('url: ', url);
 };
+
+WRTC.prototype.onGetDisplayMedia = () => {};
+
+WRTC.prototype.onGetDisplayMediaError = () => {};
+
+WRTC.prototype.onGetUserMedia = () => {};
+
+WRTC.prototype.onGetUserMediaError = () => {};
