@@ -265,14 +265,16 @@ video {
   top: 18px;
 }
 
-.fa-paper-plane{
-  display: none !important;
-}
 
-.fa-times{
-  display: none !important;
-}
+@media(min-width:640px){
+  .fa-paper-plane{
+    display: none !important;
+  }
 
+  .fa-times{
+    display: none !important;
+  }
+}
 
 @media (max-width: 640px) {
   html,

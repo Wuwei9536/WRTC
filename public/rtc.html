@@ -4,8 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
+    <title>WRTC</title>
     <link href="/css/index.css" rel="stylesheet">
     <link href="/css/snackbar.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/fontawesome/css/free.min.css" />
@@ -18,7 +18,7 @@
 <body>
     <!-- 本地视频 -->
     <div class="moveable" id="local_video_moveable">
-        <video id="local_video" autoplay playsinline style="display: block;"></video>
+        <video id="local_video" autoplay playsinline muted style="display: block;"></video>
         <canvas id="local_canvas" style="display: none;"></canvas>
         <span id="local_video_text">可拖动</span>
     </div>
@@ -98,6 +98,10 @@
     <script src="/js/WRTC.js"></script>
     <script src="/lib/stats.min.js"></script>
     <script src="/js/rtc.js"></script>
+    <script src="https://unpkg.com/vconsole/dist/vconsole.min.js"></script>
+    <script>
+        var vConsole = new window.VConsole();
+    </script>
     <script>
         if ("serviceWorker" in navigator) {
             window.addEventListener("load", function () {

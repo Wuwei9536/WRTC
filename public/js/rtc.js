@@ -36,7 +36,11 @@ const urlType = urlPath
 const urlSuffix = url.substring(url.lastIndexOf("/") + 1).toLowerCase();
 let roomHash = urlSuffix;
 
-function suggestChrome() {
+function suggestPCChrome() {
+  if (isIos()) {
+    alert("iPhone暂不支持此功能,建议使用pc端Chrome浏览器以体验全部功能");
+    return true;
+  }
   if (getBrowserName() !== "Chrome") {
     alert("该浏览器暂不支持此功能，建议使用Chrome浏览器以体验全部功能");
     return true;
@@ -145,7 +149,7 @@ function toggleChat() {
 
 // 背景替换、虚化
 function replaceBackground(type) {
-  if (suggestChrome()) return;
+  if (suggestPCChrome()) return;
   Snackbar.show({
     text: "正在处理，请稍候",
     pos: "top-left",
@@ -249,6 +253,7 @@ function transFile() {
 function record() {
   if (!WRTCEntity.RTCPeerConnection) {
     alert("必须先建立通话才能录制远端视频");
+    return;
   }
   if (!WRTCEntity.Recorder) {
     WRTCEntity.record(1000);
@@ -341,9 +346,9 @@ function bootstrap() {
     maskImg: document.getElementById("maskImg"),
     mediaConstraint: { audio: true, video: videoConstraint },
     iceServers: [
-      { url: "stun:180.76.178.16:3478" },
+      { urls: "stun:180.76.178.16:3478" },
       {
-        url: "turn:180.76.178.16:3478",
+        urls: "turn:180.76.178.16:3478",
         username: "wuwei",
         credential: "wien",
       },
