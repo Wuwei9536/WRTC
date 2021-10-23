@@ -333,7 +333,7 @@ function bootstrap() {
 
   if (getBrowserName() !== "Chrome") {
     remoteVideoText.innerText =
-      "正在等待其他用户加入,建议使用Chrome浏览器以体验全部功能";
+      "正在等待其他用户加入,建议使用PC端Chrome浏览器以体验全部功能";
   }
 
   rePositionLocalVideo();

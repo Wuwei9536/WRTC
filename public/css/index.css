@@ -311,7 +311,7 @@ video {
 
   .controls_item{
     font-size: 0.75em;
-    width: 15vw;
+    width: 20vw;
   }
 
   .controls_item > i {
@@ -354,5 +354,9 @@ video {
 
   .snackbar-container .action{
     white-space: nowrap;
+  }
+
+  .hide_on_mobile{
+    display: none;
   }
 }
