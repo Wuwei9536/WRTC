@@ -296,6 +296,19 @@ function showFps() {
   requestAnimationFrame(animate);
 }
 
+function screenshot() {
+  if (!WRTCEntity.RTCPeerConnection) {
+    alert("必须先建立通话才能截图");
+    return;
+  }
+  const imgUrl = WRTCEntity.screenshot();
+  console.log("imgUrl: ", imgUrl);
+  const anchor = document.createElement("a");
+  anchor.download = "截图";
+  anchor.href = imgUrl;
+  anchor.click();
+}
+
 // 启动程序
 function bootstrap() {
   urlType === "auth" && requestPassword();

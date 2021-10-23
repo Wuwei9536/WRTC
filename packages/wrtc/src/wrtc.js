@@ -471,6 +471,18 @@ export default class WRTC {
 
     readSlice(0); //开始读取数据
   };
+
+  screenshot = () => {
+    if (!this.RTCPeerConnection) {
+      return;
+    }
+    const tmpCanvas = document.createElement('canvas');
+    tmpCanvas.width = this.remoteVideo.videoWidth;
+    tmpCanvas.height = this.remoteVideo.videoHeight;
+    const tmpCanvas2D = tmpCanvas.getContext('2d');
+    tmpCanvas2D.drawImage(this.remoteVideo, 0, 0);
+    return tmpCanvas.toDataURL();
+  };
 }
 
 // 触发静音事件时触发
