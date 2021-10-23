@@ -1,5 +1,5 @@
 // Files to cache
-var cacheName = "wrtc-v3";
+var cacheName = "wrtc-v4";
 var cacheFiles = [
   "/lib/adapter.js",
   "/lib/autolink.js",
