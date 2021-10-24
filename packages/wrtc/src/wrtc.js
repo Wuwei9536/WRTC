@@ -287,7 +287,9 @@ export default class WRTC {
   //  收到offer
   onOffer = async (offer) => {
     log('收到offer', offer);
-    this.invite();
+    if (!this.RTCPeerConnection) {
+      this.invite();
+    }
 
     if (this.RTCPeerConnection.signalingState != 'stable') {
       log("  - But the signaling state isn't stable, so triggering rollback");
@@ -317,7 +319,10 @@ export default class WRTC {
 
   //  从对等端收到icecandidate
   onIceCandidata = async (icecandidate) => {
-    log('从对等端收到icecandidate: ', icecandidate);
+    log('从对等端收到icecandidate:' + icecandidate);
+    if (!this.RTCPeerConnection) {
+      this.invite();
+    }
     try {
       await this.RTCPeerConnection.addIceCandidate(icecandidate);
     } catch (err) {
