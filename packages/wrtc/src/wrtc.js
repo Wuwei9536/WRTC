@@ -59,6 +59,8 @@ export default class WRTC {
     this.receivedSize = 0; //数据大小
     this.fileSize = 0;
     this.fileName = '';
+    // 缓存的icecancidate
+    this.icecandidateArr = [];
 
     // 接受到对等端 『准备完成』的信号, 开始邀请通话
     socket.on('ready', this.invite);
@@ -171,7 +173,11 @@ export default class WRTC {
     log('发起呼叫');
     this.createPeerConnection();
     try {
-      this.webcamStream.getTracks().forEach((track) => this.RTCPeerConnection.addTrack(track, this.webcamStream));
+      log('getTracks');
+      this.webcamStream.getTracks().forEach((track) => {
+        log('addTracks');
+        this.RTCPeerConnection.addTrack(track, this.webcamStream);
+      });
     } catch (err) {
       error(err);
     }
@@ -209,7 +215,11 @@ export default class WRTC {
   handleNegotiationNeededEvent = async () => {
     log('开始协商');
     try {
-      if (this.RTCPeerConnection.signalingState != 'stable') {
+      // 如果正处于connecting状态 或者 非stable 状态  推迟协商
+      if (
+        this.RTCPeerConnection.signalingState != 'stable' ||
+        this.RTCPeerConnection.connectionState === 'connecting'
+      ) {
         log('signalingState ！= stable，推迟协商');
         return;
       }
@@ -287,44 +297,47 @@ export default class WRTC {
   //  收到offer
   onOffer = async (offer) => {
     log('收到offer', offer);
-    if (!this.RTCPeerConnection) {
-      this.invite();
-    }
+    this.invite();
 
     if (this.RTCPeerConnection.signalingState != 'stable') {
-      log("  - But the signaling state isn't stable, so triggering rollback");
-
+      log('  - 信令状态非stable, 回滚');
       // Set the local and remove descriptions for rollback; don't proceed
       // until both return.
       await Promise.all([
         this.RTCPeerConnection.setLocalDescription({ type: 'rollback' }),
-        this.RTCPeerConnection.setRemoteDescription(offer),
+        this.RTCPeerConnection.setRemoteDescription(new RTCSessionDescription(offer)),
       ]);
       return;
     } else {
-      log('Setting remote description(设置远端描述)');
-      await this.RTCPeerConnection.setRemoteDescription(offer);
+      log('setRemoteDescription(设置远端描述)');
+      await this.RTCPeerConnection.setRemoteDescription(new RTCSessionDescription(offer));
     }
 
     log('创建并发送answer给对等端');
     await this.RTCPeerConnection.setLocalDescription();
+    log('将缓存的icecandidate  addIceCandidate');
+    this.icecandidateArr.forEach((icecandidate) => {
+      console.log('ic: ', icecandidate);
+      this.RTCPeerConnection.addIceCandidate(new RTCIceCandidate(icecandidate));
+    });
     this.socket.emit('answer', this.RTCPeerConnection.localDescription, this.room);
   };
 
   //  收到answer
   onAnswer = async (answer) => {
-    log('收到answer', answer);
-    await this.RTCPeerConnection.setRemoteDescription(answer).catch(error);
+    log('收到answer' + JSON.stringify(answer));
+    await this.RTCPeerConnection.setRemoteDescription(new RTCSessionDescription(answer)).catch(error);
   };
 
   //  从对等端收到icecandidate
   onIceCandidata = async (icecandidate) => {
-    log('从对等端收到icecandidate:' + icecandidate);
+    log('从对等端收到icecandidate:' + JSON.stringify(icecandidate));
     if (!this.RTCPeerConnection) {
-      this.invite();
+      this.icecandidateArr.push(icecandidate);
+      return;
     }
     try {
-      await this.RTCPeerConnection.addIceCandidate(icecandidate);
+      await this.RTCPeerConnection.addIceCandidate(new RTCIceCandidate(icecandidate));
     } catch (err) {
       error(err);
     }

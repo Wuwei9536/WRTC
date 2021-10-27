@@ -63,7 +63,7 @@
             <div class="icon_text">背景替换</div>
             <img id="maskImg" src="/images/beach.jpg" width="200" height="auto" style="display: none;">
         </div>
-        <div class="controls_item" onclick="record()">
+        <div class="controls_item hide_on_mobile" onclick="record()">
             <i class="fas fa-record-vinyl fa-xs"></i>
             <div id="record_text" class="icon_text">录制</div>
         </div>
@@ -106,13 +106,13 @@
     <script>
         var vConsole = new window.VConsole();
     </script>
-    <script>
+    <!-- <script>
         if ("serviceWorker" in navigator) {
             window.addEventListener("load", function () {
                 navigator.serviceWorker.register("/sw.js");
             });
         }
-    </script>
+    </script> -->
 </body>
 
 </html>
