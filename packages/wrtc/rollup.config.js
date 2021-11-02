@@ -7,7 +7,7 @@ export default [
   {
     input: 'src/index.js',
     output: {
-      file: 'umd/WRTC.js',
+      file: '../../public/js/WRTC.js',
       format: 'umd',
       name: 'WRTC',
     },
@@ -21,37 +21,37 @@ export default [
       nodeResolve(),
     ],
   },
-  {
-    input: 'src/index.js',
-    output: {
-      file: 'es/WRTC.js',
-      format: 'es',
-    },
-    plugins: [
-      terser({
-        compress: {
-          drop_console: true,
-        },
-      }),
-      webWorkerLoader(),
-      nodeResolve(),
-    ],
-  },
-  {
-    input: 'src/index.js',
-    output: {
-      file: 'cjs/WRTC.js',
-      format: 'cjs',
-      exports: 'default',
-    },
-    plugins: [
-      terser({
-        compress: {
-          drop_console: true,
-        },
-      }),
-      webWorkerLoader(),
-      nodeResolve(),
-    ],
-  },
+  // {
+  //   input: 'src/index.js',
+  //   output: {
+  //     file: 'es/WRTC.js',
+  //     format: 'es',
+  //   },
+  //   plugins: [
+  //     terser({
+  //       compress: {
+  //         drop_console: true,
+  //       },
+  //     }),
+  //     webWorkerLoader(),
+  //     nodeResolve(),
+  //   ],
+  // },
+  // {
+  //   input: 'src/index.js',
+  //   output: {
+  //     file: 'cjs/WRTC.js',
+  //     format: 'cjs',
+  //     exports: 'default',
+  //   },
+  //   plugins: [
+  //     terser({
+  //       compress: {
+  //         drop_console: true,
+  //       },
+  //     }),
+  //     webWorkerLoader(),
+  //     nodeResolve(),
+  //   ],
+  // },
 ];
