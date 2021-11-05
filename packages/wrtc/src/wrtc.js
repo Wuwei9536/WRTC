@@ -454,8 +454,7 @@ export default class WRTC {
     this.BackgroundReplacement.mode = type;
     if (this.BackgroundReplacement.state === 'inactive' && type !== 'origin') {
       this.BackgroundReplacement.restart();
-    }
-    if ((type === premode || type === 'origin') && this.BackgroundReplacement.state === 'active') {
+    } else if ((type === premode || type === 'origin') && this.BackgroundReplacement.state === 'active') {
       this.BackgroundReplacement.stop();
     }
     if (this.RTCPeerConnection && this.RTCPeerConnection.connectionState === 'connected' && type !== 'origin') {
