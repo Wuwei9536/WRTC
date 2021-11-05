@@ -1,5 +1,5 @@
 // Files to cache
-var cacheName = "wrtc-v4";
+var cacheName = "wrtc-v5";
 var cacheFiles = [
   "/lib/adapter.js",
   "/lib/autolink.js",
@@ -12,6 +12,10 @@ var cacheFiles = [
   "/icons/icon-256x256.png",
   "/images/logo.png",
   "/css/snackbar.min.css",
+  "/js/call.js",
+  "/js/common.js",
+  "/js/rtc.js",
+  "/js/WRTC.js",
 ];
 
 // Installing Service Worker
@@ -47,7 +51,7 @@ self.addEventListener("fetch", function (e) {
 });
 
 self.addEventListener("activate", function (event) {
-  var cacheWhitelist = ["wrtc-v3"];
+  var cacheWhitelist = ["wrtc-v5"];
 
   event.waitUntil(
     caches.keys().then(function (keyList) {
