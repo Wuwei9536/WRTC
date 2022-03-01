@@ -1,5 +1,5 @@
 // Files to cache
-var cacheName = "wrtc-v5";
+var cacheName = "wrtc-v6";
 var cacheFiles = [
   "/lib/adapter.js",
   "/lib/autolink.js",
@@ -51,7 +51,7 @@ self.addEventListener("fetch", function (e) {
 });
 
 self.addEventListener("activate", function (event) {
-  var cacheWhitelist = ["wrtc-v5"];
+  var cacheWhitelist = [cacheName];
 
   event.waitUntil(
     caches.keys().then(function (keyList) {

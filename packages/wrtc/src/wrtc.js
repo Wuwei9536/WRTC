@@ -93,6 +93,7 @@ export default class WRTC {
     this.RTCPeerConnection.onnegotiationneeded = this.handleNegotiationNeededEvent;
     this.RTCPeerConnection.ontrack = this.handleTrackEvent;
 
+    /* --- 数据传输通道 --- */
     //将通用数据通道添加到对等连接，
     //用于文字聊天，字幕和切换发送字幕
     this.DataChanel = this.RTCPeerConnection.createDataChannel('chat', {
@@ -119,7 +120,7 @@ export default class WRTC {
           //创建文件
           const received = new Blob(this.receivedBuffer, { type: 'application/octet-stream' });
           console.log('received: ', received);
-
+          // 通过onRecieveFile抛出文件url给用户自行处理
           this.onRecieveFile({ url: URL.createObjectURL(received), fileName: this.fileName, fileSize: this.fileSize });
           //将buffer和 size 清空，为下一次传文件做准备
           this.receivedBuffer = [];
@@ -142,30 +143,10 @@ export default class WRTC {
         this.onRecieveMessage(cleanedMessage);
       }
     };
+    /* --- 数据传输通道 --- */
 
+    // 初始化白板
     this.WHITEBOARD = new WHITEBOARD({ dataChanel: this.DataChanel, whiteboardId: this.whiteboardId });
-  };
-
-  // 录制
-  record = (timeSlice) => {
-    if (!this.remoteStream) {
-      return;
-    }
-    this.Recorder = new Recorder({
-      stream: this.remoteStream,
-    });
-    this.Recorder.start(timeSlice);
-  };
-
-  // 停止录制
-  stopRecord = () => {
-    const blob = this.Recorder.stop();
-    //生成下载地址
-    const downloadAnchor = document.createElement('a');
-    downloadAnchor.href = URL.createObjectURL(blob);
-    downloadAnchor.download = '录制文件';
-    downloadAnchor.click();
-    this.Recorder = null;
   };
 
   // 发起呼叫
@@ -241,7 +222,7 @@ export default class WRTC {
       case 'connected':
         const config = this.RTCPeerConnection.getConfiguration();
         log('*** 连接配置为: ' + JSON.stringify(config));
-        if (this.BackgroundReplacement) {
+        if (this.BackgroundReplacement && this.BackgroundReplacement.state === 'active') {
           this.switchStream(this.BackgroundReplacement.stream);
         }
         break;
@@ -281,6 +262,7 @@ export default class WRTC {
     log('ICE连接状态变更为 ' + this.RTCPeerConnection.iceConnectionState);
   };
 
+  //  信令状态变更
   handleSignalingStateChange = (event) => {
     log('信令状态变更为: ' + this.RTCPeerConnection.signalingState);
     switch (this.RTCPeerConnection.signalingState) {
@@ -290,6 +272,7 @@ export default class WRTC {
     }
   };
 
+  // ICE收集状态变更
   handleICEGatheringStateChange = (event) => {
     log('ICE收集状态变更为 : ' + this.RTCPeerConnection.iceGatheringState);
   };
@@ -448,20 +431,25 @@ export default class WRTC {
         webcamStream: this.webcamStream,
         maskImg: this.maskImg,
         backgroundCanvasId: this.backgroundCanvasId,
+        mode: type
       });
+      if(this.RTCPeerConnection && this.RTCPeerConnection.connectionState === 'connected' ){
+        this.switchStream(this.BackgroundReplacement.stream);
+      }
+      return;
     }
     const premode = this.BackgroundReplacement.mode;
     this.BackgroundReplacement.mode = type;
     if (this.BackgroundReplacement.state === 'inactive' && type !== 'origin') {
       this.BackgroundReplacement.restart();
+      if(this.RTCPeerConnection && this.RTCPeerConnection.connectionState === 'connected' ){
+        this.switchStream(this.BackgroundReplacement.stream);
+      }
     } else if ((type === premode || type === 'origin') && this.BackgroundReplacement.state === 'active') {
       this.BackgroundReplacement.stop();
-    }
-    if (this.RTCPeerConnection && this.RTCPeerConnection.connectionState === 'connected' && type !== 'origin') {
-      this.switchStream(this.BackgroundReplacement.stream);
-    }
-    if (this.RTCPeerConnection && this.RTCPeerConnection.connectionState === 'connected' && type === 'origin') {
-      this.switchStream(this.webcamStream);
+      if(this.RTCPeerConnection && this.RTCPeerConnection.connectionState === 'connected' ){
+        this.switchStream(this.webcamStream);
+      }
     }
   }
 
@@ -489,6 +477,7 @@ export default class WRTC {
     readSlice(0); //开始读取数据
   };
 
+  // 截图
   screenshot = () => {
     if (!this.RTCPeerConnection) {
       return;
@@ -499,6 +488,28 @@ export default class WRTC {
     const tmpCanvas2D = tmpCanvas.getContext('2d');
     tmpCanvas2D.drawImage(this.remoteVideo, 0, 0);
     return tmpCanvas.toDataURL();
+  };
+
+  // 录制
+  record = (timeSlice) => {
+    if (!this.remoteStream) {
+      return;
+    }
+    this.Recorder = new Recorder({
+      stream: this.remoteStream,
+    });
+    this.Recorder.start(timeSlice);
+  };
+
+  // 停止录制
+  stopRecord = () => {
+    const blob = this.Recorder.stop();
+    //生成下载地址
+    const downloadAnchor = document.createElement('a');
+    downloadAnchor.href = URL.createObjectURL(blob);
+    downloadAnchor.download = '录制文件';
+    downloadAnchor.click();
+    this.Recorder = null;
   };
 }
 
